@@ -188,3 +188,14 @@ runs:
       run: |
         SYMBOL_LIST=android/abi_gki_aarch64_xiaomi
         echo "device_find_any_child" >> $SYMBOL_LIST
+
+    # Stock zram.ko is unsigned under a non-Google key; TRIM_UNUSED_KSYMS only lets it import allow-listed symbols.
+    - name: Allow stock zram.ko on 6.12 GKI Devices
+      if: inputs.version == 'android16-6.12'
+      shell: bash
+      working-directory: ${{ github.workspace }}/kernel/common
+      run: |
+        set -euo pipefail
+        SYMBOL_LIST=gki/aarch64/symbols/xiaomi
+        test -f "$SYMBOL_LIST" || { echo "Missing $SYMBOL_LIST" >&2; exit 1; }
+        grep -qx '  kernel_read_file_from_path' "$SYMBOL_LIST" || echo "  kernel_read_file_from_path" >> "$SYMBOL_LIST"
