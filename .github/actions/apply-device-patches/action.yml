@@ -199,3 +199,11 @@ runs:
         SYMBOL_LIST=gki/aarch64/symbols/xiaomi
         test -f "$SYMBOL_LIST" || { echo "Missing $SYMBOL_LIST" >&2; exit 1; }
         grep -qx '  kernel_read_file_from_path' "$SYMBOL_LIST" || echo "  kernel_read_file_from_path" >> "$SYMBOL_LIST"
+
+        DENY_LIST=../build/kernel/abi/symbols.deny
+        test -f "$DENY_LIST" || { echo "Missing $DENY_LIST" >&2; exit 1; }
+        sed -i 's/^kernel_read_file_from_path\b/# &/' "$DENY_LIST"
+        if grep -q '^kernel_read_file_from_path\b' "$DENY_LIST"; then
+          echo "kernel_read_file_from_path still denied in $DENY_LIST" >&2
+          exit 1
+        fi
