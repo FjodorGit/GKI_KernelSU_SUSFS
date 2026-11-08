@@ -230,7 +230,7 @@ jobs:
           emit ksu_commit "$KERNELSU_COMMIT"
           emit resukisu_commit "$RESUKISU_COMMIT"
           if [ "${{ inputs.use_susfs }}" = "true" ]; then
-            NEXT_COMMIT="$(resolve_sha https://github.com/pershoot/KernelSU-Next.git refs/heads/dev-susfs)"
+            NEXT_COMMIT="19d9e1f255d4afedb85eb7032f4725cda6d25d36"  # r20 release pin
           else
             NEXT_COMMIT="$(resolve_sha https://github.com/KernelSU-Next/KernelSU-Next.git refs/heads/dev)"
           fi
@@ -287,9 +287,9 @@ jobs:
           done
 
           # Tracked build helpers (resolved automatically, before the run)
-          emit kernel_patches_commit "$(resolve_sha https://github.com/WildKernels/kernel_patches.git refs/heads/main)"
-          emit anykernel3_commit   "$(resolve_sha https://github.com/WildKernels/AnyKernel3.git refs/heads/gki-2.0)"
-          emit droidspaces_commit  "$(resolve_sha https://github.com/ravindu644/Droidspaces-OSS.git refs/heads/main)"
+          emit kernel_patches_commit "757201d983e2549dc7945a21fa6a056eb2e55263"  # r20 pin
+          emit anykernel3_commit   "e1e9dce98430c5c6f231f7094a8c7f4ecaf50948"  # r20 pin
+          emit droidspaces_commit  "f60294ac4c8aa2cc860773ac85bc5790104eb77f"  # r20 pin
 
           echo "Resolved:"
           env | grep -E '^(nomount_commit|kernelsu_commit|kernelsu_branch|root_commit|susfs_commit_|kernel_patches_commit|anykernel3_commit|droidspaces_commit)' | sort || true

@@ -51,6 +51,15 @@ runs:
             echo "[!] Note: Branch ${FORMATTED_BRANCH} is considered deprecated."
             DEPRECATED=true
           fi
+          # Google deletes old ACK branches but keeps their _rN tags.
+          if [ -z "$REMOTE_BRANCH" ]; then
+            LAST_TAG=$(git ls-remote --tags https://android.googlesource.com/kernel/common "refs/tags/${FORMATTED_BRANCH}_r*" \
+              | awk '{print $2}' | grep -v '\^{}$' | sort -V | tail -n1)
+            [ -n "$LAST_TAG" ] || { echo "ERROR: ${FORMATTED_BRANCH} has neither a branch nor _rN tags" >&2; return 1; }
+            sed -i "s|revision=\"${FORMATTED_BRANCH}\"|revision=\"${LAST_TAG}\"|" "$DEFAULT_MANIFEST_PATH"
+            grep -q "revision=\"${LAST_TAG}\"" "$DEFAULT_MANIFEST_PATH" || { echo "ERROR: manifest not repointed to ${LAST_TAG}" >&2; return 1; }
+            echo "[!] Branch ${FORMATTED_BRANCH} is gone; building ${LAST_TAG}"
+          fi
           echo "deprecated=$DEPRECATED" >> $GITHUB_OUTPUT
         }
 
