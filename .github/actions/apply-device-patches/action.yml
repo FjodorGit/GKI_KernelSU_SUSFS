@@ -198,7 +198,9 @@ runs:
         set -euo pipefail
         SYMBOL_LIST=gki/aarch64/symbols/xiaomi
         test -f "$SYMBOL_LIST" || { echo "Missing $SYMBOL_LIST" >&2; exit 1; }
-        grep -qx '  kernel_read_file_from_path' "$SYMBOL_LIST" || echo "  kernel_read_file_from_path" >> "$SYMBOL_LIST"
+        # Appending after the file's trailing blank line breaks the configparser-based list reader.
+        grep -qx '  kernel_read_file_from_path' "$SYMBOL_LIST" || sed -i '0,/^\[abi_symbol_list\]$/s//&\n  kernel_read_file_from_path/' "$SYMBOL_LIST"
+        grep -qx '  kernel_read_file_from_path' "$SYMBOL_LIST" || { echo "Failed to add symbol to $SYMBOL_LIST" >&2; exit 1; }
 
         DENY_LIST=../build/kernel/abi/symbols.deny
         test -f "$DENY_LIST" || { echo "Missing $DENY_LIST" >&2; exit 1; }
